@@ -21,14 +21,17 @@ def main():
 
     os.makedirs("training", exist_ok=True)
 
+    retraining_time = datetime.utcnow().isoformat()
+
     metrics = {
         "status": "completed",
-        "message": "Retraining workflow executed successfully",
+        "message": "Retraining workflow executed successfully because drift was detected",
         "dataset": dataset_path,
         "rows": int(df.shape[0]),
         "columns": int(df.shape[1]),
-        "retraining_time_utc": datetime.utcnow().isoformat(),
-        "new_model_version": "model-v2-candidate"
+        "retraining_time_utc": retraining_time,
+        "current_model_version": "baseline-model",
+        "candidate_model_version": "model-v2-candidate"
     }
 
     with open("training/retraining_metrics.json", "w") as file:

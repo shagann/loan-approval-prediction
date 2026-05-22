@@ -65,9 +65,15 @@ jobs:
       - name: Install retraining dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas
+          pip install pandas scikit-learn joblib
 
       - name: Run retraining script
         run: |
           echo "Drift detected. Starting retraining..."
           python training/retrain_model.py
+
+      - name: Upload retraining metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: retraining-metrics
+          path: training/retraining_metrics.json
