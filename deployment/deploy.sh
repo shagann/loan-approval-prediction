@@ -23,6 +23,7 @@ docker run -d \
   --name loan-approval-app \
   --restart unless-stopped \
   -p 80:5000 \
+  -v /opt/mlops/loan-approval-prediction/logs:/app/logs \
   -e APP_VERSION=manual-deploy-script \
   -e GIT_COMMIT=$(git rev-parse --short HEAD) \
   -e BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
