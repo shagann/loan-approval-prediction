@@ -1,10 +1,16 @@
-name: Drift Check
+name: Drift Check and Retrain
 
 "on":
   workflow_dispatch:
-  push:
-    branches:
-      - main
+    inputs:
+      force_drift:
+        description: "Force drift for demo?"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
   schedule:
     - cron: "0 9 * * *"
 
@@ -12,13 +18,56 @@ jobs:
   drift-check:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Run normal drift check
-        run: |
-          echo "Running normal drift check..."
-          curl -f "http://${{ secrets.VM_HOST }}/drift-check"
+    outputs:
+      drift_detected: ${{ steps.check_drift.outputs.drift_detected }}
 
-      - name: Run forced drift check demo
+    steps:
+      - name: Choose drift check URL
+        id: drift_url
         run: |
-          echo "Running forced drift demo..."
-          curl -f "http://${{ secrets.VM_HOST }}/drift-check?force=true"
+          if [ "${{ github.event.inputs.force_drift }}" = "true" ]; then
+            echo "url=http://${{ secrets.VM_HOST }}/drift-check?force=true" >> $GITHUB_OUTPUT
+          else
+            echo "url=http://${{ secrets.VM_HOST }}/drift-check" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run drift check
+        id: check_drift
+        run: |
+          echo "Running drift check..."
+          echo "URL: ${{ steps.drift_url.outputs.url }}"
+
+          curl -f "${{ steps.drift_url.outputs.url }}" -o drift_result.json
+
+          echo "Drift result:"
+          cat drift_result.json
+
+          DRIFT_DETECTED=$(python -c "import json; print(str(json.load(open('drift_result.json')).get('drift_detected', False)).lower())")
+
+          echo "drift_detected=$DRIFT_DETECTED" >> $GITHUB_OUTPUT
+          echo "Drift detected: $DRIFT_DETECTED"
+
+  retrain:
+    runs-on: ubuntu-latest
+    needs: drift-check
+
+    if: needs.drift-check.outputs.drift_detected == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn joblib
+
+      - name: Run retraining script
+        run: |
+          echo "Drift detected. Starting retraining..."
+          python training/retrain_model.py
