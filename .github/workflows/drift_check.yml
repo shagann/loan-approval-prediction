@@ -1,0 +1,21 @@
+name: Drift Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *"
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run normal drift check
+        run: |
+          echo "Running normal drift check..."
+          curl -f "http://${{ secrets.VM_HOST }}/drift-check"
+
+      - name: Run forced drift check demo
+        run: |
+          echo "Running forced drift demo..."
+          curl -f "http://${{ secrets.VM_HOST }}/drift-check?force=true"
