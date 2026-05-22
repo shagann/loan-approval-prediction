@@ -1,0 +1,57 @@
+name: Model Package Rollback
+
+"on":
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: "Commit SHA to restore the model package from"
+        required: true
+        type: string
+      model_package_path:
+        description: "Model package folder to roll back"
+        required: true
+        default: "models/baseline-model"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  rollback-model-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Show rollback details
+        run: |
+          echo "Rolling back model package..."
+          echo "Source commit: ${{ github.event.inputs.source_commit }}"
+          echo "Model package path: ${{ github.event.inputs.model_package_path }}"
+
+      - name: Restore model package from selected commit
+        run: |
+          git checkout ${{ github.event.inputs.source_commit }} -- ${{ github.event.inputs.model_package_path }}
+
+      - name: Show changed files
+        run: |
+          git status
+          git diff --stat
+
+      - name: Commit model package rollback
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add ${{ github.event.inputs.model_package_path }}
+
+          if git diff --cached --quiet; then
+            echo "No model package changes to commit."
+          else
+            git commit -m "Rollback model package to ${{ github.event.inputs.source_commit }}"
+            git push origin main
+          fi
