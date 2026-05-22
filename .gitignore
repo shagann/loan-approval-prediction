@@ -15,6 +15,7 @@ dist/
 
 # Logs
 *.log
+logs/predictions.csv
 
 # OS files
 .DS_Store

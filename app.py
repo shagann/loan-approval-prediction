@@ -6,6 +6,9 @@ import joblib
 import numpy as np
 import pandas as pd
 import os
+import csv
+from datetime import datetime
+
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Required for session management
@@ -308,7 +311,10 @@ def home():
             # Store results in session and redirect to results page
             session['prediction'] = str(prediction) if prediction is not None else None
             session['confidence'] = confidence_score
-            
+
+            # Log prediction for monitoring and drift checks
+            log_prediction(user_input, prediction, confidence_score)
+
             # Convert user_input values to native Python types for session storage
             user_input_clean = {}
             for key, value in user_input.items():
@@ -352,6 +358,70 @@ def results():
                          user_input=user_input, 
                          is_eligible=is_eligible,
                          confidence=confidence)
+
+LOG_DIR = "logs"
+PREDICTION_LOG_FILE = os.path.join(LOG_DIR, "predictions.csv")
+
+
+def log_prediction(user_input, prediction, confidence):
+    """Save each prediction so it can be used for monitoring and drift checks."""
+
+    os.makedirs(LOG_DIR, exist_ok=True)
+
+    file_exists = os.path.exists(PREDICTION_LOG_FILE)
+
+    fieldnames = [
+        "timestamp",
+        "Loan_ID",
+        "Gender",
+        "Married",
+        "Dependents",
+        "Education",
+        "Self_Employed",
+        "ApplicantIncome",
+        "CoapplicantIncome",
+        "LoanAmount",
+        "Loan_Amount_Term",
+        "Credit_History",
+        "Property_Area",
+        "prediction",
+        "confidence",
+        "app_version",
+        "model_version"
+    ]
+
+    row = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "Loan_ID": user_input.get("Loan_ID"),
+        "Gender": user_input.get("Gender"),
+        "Married": user_input.get("Married"),
+        "Dependents": user_input.get("Dependents"),
+        "Education": user_input.get("Education"),
+        "Self_Employed": user_input.get("Self_Employed"),
+        "ApplicantIncome": user_input.get("ApplicantIncome"),
+        "CoapplicantIncome": user_input.get("CoapplicantIncome"),
+        "LoanAmount": user_input.get("LoanAmount"),
+        "Loan_Amount_Term": user_input.get("Loan_Amount_Term"),
+        "Credit_History": user_input.get("Credit_History"),
+        "Property_Area": user_input.get("Property_Area"),
+        "prediction": prediction,
+        "confidence": confidence,
+        "app_version": os.environ.get("APP_VERSION", "local-dev"),
+        "model_version": os.environ.get("MODEL_VERSION", "baseline-model")
+    }
+
+    with open(PREDICTION_LOG_FILE, mode="a", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow(row)
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
