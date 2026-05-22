@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import joblib
 import numpy as np
 import pandas as pd
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Required for session management
@@ -219,10 +220,12 @@ def health():
 def version():
     return {
         "app_name": "Loan Approval Prediction API",
-        "app_version": "v1.0.0",
-        "model_version": "baseline-model",
-        "deployment_environment": "manual-vm",
-        "mlops_stage": "health-and-version-checks"
+        "app_version": os.environ.get("APP_VERSION", "local-dev"),
+        "git_commit": os.environ.get("GIT_COMMIT", "not-set"),
+        "build_time": os.environ.get("BUILD_TIME", "not-set"),
+        "model_version": os.environ.get("MODEL_VERSION", "baseline-model"),
+        "deployment_environment": os.environ.get("DEPLOYMENT_ENVIRONMENT", "local"),
+        "deployment_colour": os.environ.get("DEPLOYMENT_COLOUR", "none")
     }, 200
 
 
