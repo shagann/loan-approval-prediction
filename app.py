@@ -215,6 +215,18 @@ def health():
         "service": "Loan Approval Prediction API"
     }, 200
 
+@app.route('/version')
+def version():
+    return {
+        "app_name": "Loan Approval Prediction API",
+        "app_version": "v1.0.0",
+        "model_version": "baseline-model",
+        "deployment_environment": "manual-vm",
+        "mlops_stage": "health-and-version-checks"
+    }, 200
+
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -339,4 +351,4 @@ def results():
                          confidence=confidence)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
