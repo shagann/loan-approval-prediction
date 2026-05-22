@@ -15,7 +15,7 @@ def main():
 
     df = pd.read_csv(dataset_path)
 
-    print(f"Loaded dataset: {dataset_path}")
+    print("Dataset loaded successfully.")
     print(f"Rows: {df.shape[0]}")
     print(f"Columns: {df.shape[1]}")
 
