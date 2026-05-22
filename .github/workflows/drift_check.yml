@@ -1,7 +1,11 @@
+cat > .github/workflows/drift_check.yml <<'EOF'
 name: Drift Check
 
-on:
+"on":
   workflow_dispatch:
+  push:
+    branches:
+      - main
   schedule:
     - cron: "0 9 * * *"
 
@@ -19,3 +23,4 @@ jobs:
         run: |
           echo "Running forced drift demo..."
           curl -f "http://${{ secrets.VM_HOST }}/drift-check?force=true"
+EOF
