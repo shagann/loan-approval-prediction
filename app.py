@@ -208,6 +208,14 @@ INPUT_FIELDS = {
     "Property_Area": str
 }
 
+@app.route('/health')
+def health():
+    return {
+        "status": "running",
+        "service": "Loan Approval Prediction API"
+    }, 200
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
