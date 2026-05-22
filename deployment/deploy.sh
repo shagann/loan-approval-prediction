@@ -25,6 +25,7 @@ docker run -d \
   -p 80:5000 \
   -v /opt/mlops/loan-approval-prediction/logs:/app/logs \
   -e APP_VERSION=manual-deploy-script \
+  -e MODEL_VERSION=baseline-model \
   -e GIT_COMMIT=$(git rev-parse --short HEAD) \
   -e BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   -e DEPLOYMENT_ENVIRONMENT=google-vm-docker-bridge \

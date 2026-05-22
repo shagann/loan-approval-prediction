@@ -1,0 +1,16 @@
+{
+  "model_version": "baseline-model",
+  "model_stage": "production",
+  "created_for": "Loan Approval Prediction API",
+  "training_dataset": "LAP.csv",
+  "model_files": [
+    "model.pth",
+    "best_model.pth"
+  ],
+  "preprocessing_files": [
+    "scaler.pkl",
+    "label_encoders.pkl",
+    "label_encoder_target.pkl"
+  ],
+  "notes": "Baseline deployed model package. The PyTorch model and preprocessing PKL files are versioned together because inference depends on the scaler and label encoders matching the trained model."
+}
