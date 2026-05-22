@@ -293,6 +293,111 @@ def metrics():
         "monitoring_source": "logs/predictions.csv"
     })
 
+
+
+@app.route('/drift-check')
+def drift_check():
+    """Simple drift check using recent prediction logs."""
+
+    # Forced mode for demo/presentation
+    force_drift = request.args.get("force", "false").lower() == "true"
+
+    if force_drift:
+        return jsonify({
+            "drift_detected": True,
+            "drift_type": "forced_demo_drift",
+            "message": "Forced drift mode enabled for demonstration",
+            "drift_features": {
+                "ApplicantIncome": {
+                    "baseline_mean": 5400,
+                    "recent_mean": 50000,
+                    "percent_change": 825.93,
+                    "threshold_percent": 20
+                },
+                "LoanAmount": {
+                    "baseline_mean": 150,
+                    "recent_mean": 25000,
+                    "percent_change": 16566.67,
+                    "threshold_percent": 20
+                }
+            },
+            "recommendation": "Retraining should be considered"
+        })
+
+    if not os.path.exists(PREDICTION_LOG_FILE):
+        return jsonify({
+            "drift_detected": False,
+            "message": "No prediction logs available yet",
+            "recommendation": "Collect more live prediction data before checking drift",
+            "monitoring_source": "logs/predictions.csv"
+        })
+
+    df = pd.read_csv(PREDICTION_LOG_FILE)
+
+    if df.empty:
+        return jsonify({
+            "drift_detected": False,
+            "message": "Prediction log is empty",
+            "recommendation": "Collect more live prediction data before checking drift",
+            "monitoring_source": "logs/predictions.csv"
+        })
+
+    # Simple baseline values for demo.
+    # Later these could be calculated from LAP.csv.
+    baseline_stats = {
+        "ApplicantIncome": 5400,
+        "CoapplicantIncome": 1600,
+        "LoanAmount": 150,
+        "Loan_Amount_Term": 360,
+        "Credit_History": 0.85
+    }
+
+    drift_threshold_percent = 20
+    drift_features = {}
+    checked_features = []
+
+    recent_df = df.tail(20)
+
+    for feature, baseline_mean in baseline_stats.items():
+        if feature in recent_df.columns:
+            checked_features.append(feature)
+
+            recent_mean = pd.to_numeric(
+                recent_df[feature],
+                errors="coerce"
+            ).mean()
+
+            if pd.isna(recent_mean):
+                continue
+
+            percent_change = abs((recent_mean - baseline_mean) / baseline_mean) * 100
+
+            if percent_change > drift_threshold_percent:
+                drift_features[feature] = {
+                    "baseline_mean": round(float(baseline_mean), 4),
+                    "recent_mean": round(float(recent_mean), 4),
+                    "percent_change": round(float(percent_change), 2),
+                    "threshold_percent": drift_threshold_percent
+                }
+
+    drift_detected = len(drift_features) > 0
+
+    recommendation = (
+        "Retraining should be considered"
+        if drift_detected
+        else "No retraining required based on current drift rules"
+    )
+
+    return jsonify({
+        "drift_detected": drift_detected,
+        "checked_features": checked_features,
+        "drift_features": drift_features,
+        "recent_window_size": int(len(recent_df)),
+        "monitoring_source": "logs/predictions.csv",
+        "recommendation": recommendation
+    })
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
