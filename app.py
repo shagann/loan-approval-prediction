@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -232,7 +232,66 @@ def version():
     }, 200
 
 
+@app.route('/metrics')
+def metrics():
+    """Return simple monitoring metrics from the prediction log."""
 
+    if not os.path.exists(PREDICTION_LOG_FILE):
+        return jsonify({
+            "total_predictions": 0,
+            "approved_predictions": 0,
+            "rejected_predictions": 0,
+            "average_confidence": None,
+            "last_prediction_time": None,
+            "model_version": os.environ.get("MODEL_VERSION", "baseline-model"),
+            "monitoring_source": "logs/predictions.csv",
+            "message": "No predictions have been logged yet"
+        })
+
+    df = pd.read_csv(PREDICTION_LOG_FILE)
+
+    if df.empty:
+        return jsonify({
+            "total_predictions": 0,
+            "approved_predictions": 0,
+            "rejected_predictions": 0,
+            "average_confidence": None,
+            "last_prediction_time": None,
+            "model_version": os.environ.get("MODEL_VERSION", "baseline-model"),
+            "monitoring_source": "logs/predictions.csv",
+            "message": "Prediction log is empty"
+        })
+
+    total_predictions = len(df)
+
+    approved_predictions = len(
+        df[df["prediction"].astype(str).str.lower().isin([
+            "1", "y", "yes", "approved", "approve", "loan approved"
+        ])]
+    )
+
+    rejected_predictions = total_predictions - approved_predictions
+
+    average_confidence = None
+    if "confidence" in df.columns:
+        average_confidence = round(
+            pd.to_numeric(df["confidence"], errors="coerce").mean(),
+            4
+        )
+
+    last_prediction_time = None
+    if "timestamp" in df.columns:
+        last_prediction_time = df["timestamp"].iloc[-1]
+
+    return jsonify({
+        "total_predictions": int(total_predictions),
+        "approved_predictions": int(approved_predictions),
+        "rejected_predictions": int(rejected_predictions),
+        "average_confidence": average_confidence,
+        "last_prediction_time": last_prediction_time,
+        "model_version": os.environ.get("MODEL_VERSION", "baseline-model"),
+        "monitoring_source": "logs/predictions.csv"
+    })
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -424,4 +483,4 @@ def log_prediction(user_input, prediction, confidence):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
