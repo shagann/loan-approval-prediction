@@ -65,6 +65,9 @@ jobs:
       # Checkout the repository so the retraining script can access data and model artefacts.
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ACTIONS_PUSH_TOKEN }}
+          fetch-depth: 0
 
       # Use Python 3.9 to match the Docker/app environment.
       - name: Set up Python
@@ -96,7 +99,7 @@ jobs:
             echo "No retraining artefacts to commit."
           else
             git commit -m "Add candidate model package from retraining workflow"
-            git push origin main
+            git push origin HEAD:main
           fi
 
       # Upload the retraining metrics as a visible GitHub Actions artifact.
