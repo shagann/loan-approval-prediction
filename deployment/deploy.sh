@@ -12,11 +12,8 @@ git pull origin main
 echo "Building Docker image..."
 docker build --network=host -t loan-approval-app .
 
-echo "Stopping old container if it exists..."
-docker stop loan-approval-app || true
-
-echo "Removing old container if it exists..."
-docker rm loan-approval-app || true
+echo "Stopping and removing old container if it exists..."
+docker rm -f loan-approval-app || true
 
 echo "Starting new Docker container..."
 docker run -d \
