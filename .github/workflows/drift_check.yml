@@ -99,6 +99,7 @@ jobs:
             echo "No retraining artefacts to commit."
           else
             git commit -m "Add candidate model package from retraining workflow"
+            git remote set-url origin "https://x-access-token:${{ secrets.ACTIONS_PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
             git push origin HEAD:main
           fi
 
