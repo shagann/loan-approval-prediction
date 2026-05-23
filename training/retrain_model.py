@@ -29,6 +29,8 @@ def main():
     print(f"Rows: {df.shape[0]}")
     print(f"Columns: {df.shape[1]}")
 
+    # Recreate the candidate package each time retraining runs.
+    # This keeps model-v2-candidate as the latest retraining output.
     if os.path.exists(candidate_model_dir):
         print(f"Removing existing candidate package: {candidate_model_dir}")
         shutil.rmtree(candidate_model_dir)
@@ -38,6 +40,9 @@ def main():
 
     retraining_time = datetime.utcnow().isoformat()
 
+    # Metadata for the candidate model package.
+    # In this assignment version, the baseline artefacts are copied and the
+    # metadata is updated to demonstrate the MLOps model versioning flow.
     metadata = {
         "model_version": candidate_model_version,
         "model_stage": "candidate",
@@ -70,6 +75,30 @@ def main():
 
     os.makedirs("training", exist_ok=True)
 
+    # Demo evaluation gate.
+    # In a production MLOps pipeline, these values would be calculated by
+    # evaluating the candidate model against a validation/test dataset.
+    #
+    # For the demo, the candidate is marked as approved so the workflow can
+    # demonstrate automatic promotion after retraining.
+    baseline_accuracy = 0.78
+    candidate_accuracy = 0.80
+    baseline_f1 = 0.81
+    candidate_f1 = 0.84
+
+    if candidate_f1 >= baseline_f1 and candidate_accuracy >= baseline_accuracy:
+        promotion_decision = "approved"
+        promotion_reason = (
+            "Candidate model passed the demo evaluation gate. "
+            "Candidate F1 and accuracy are greater than or equal to the baseline."
+        )
+    else:
+        promotion_decision = "rejected"
+        promotion_reason = (
+            "Candidate model did not pass the demo evaluation gate. "
+            "Production model should remain unchanged."
+        )
+
     metrics = {
         "status": "completed",
         "message": "Retraining workflow executed successfully because drift was detected",
@@ -80,7 +109,15 @@ def main():
         "source_model_version": source_model_version,
         "candidate_model_version": candidate_model_version,
         "candidate_model_package": candidate_model_dir,
-        "metadata_path": metadata_path
+        "metadata_path": metadata_path,
+
+        # Evaluation gate output used by the GitHub Actions workflow.
+        "baseline_accuracy": baseline_accuracy,
+        "candidate_accuracy": candidate_accuracy,
+        "baseline_f1": baseline_f1,
+        "candidate_f1": candidate_f1,
+        "promotion_decision": promotion_decision,
+        "promotion_reason": promotion_reason
     }
 
     with open("training/retraining_metrics.json", "w") as file:
