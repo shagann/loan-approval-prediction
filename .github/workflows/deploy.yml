@@ -1,25 +1,54 @@
 name: Deploy Loan Approval App
 
-# Run this workflow when code or model package changes are pushed to main.
-# Also allow it to be started manually or triggered by another workflow.
+run-name: Deploy app/model from ${{ github.event_name }} by ${{ github.actor }}
+
+# Continuous Deployment workflow.
+#
+# This workflow deploys the latest version of the app and selected model package
+# to the Google VM.
+#
+# It runs when:
+# 1. Code is pushed to main.
+# 2. A retraining workflow commits a candidate model package to main.
+# 3. A rollback workflow commits a restored model package to main.
+# 4. The workflow is manually started using Run workflow.
+#
+# The manual trigger is kept as a backup redeploy option.
+
 "on":
   push:
     branches:
       - main
   workflow_dispatch:
 
+# Prevent overlapping deployments to the same VM.
+# If a newer deploy starts while an older one is still running, cancel the older one.
 concurrency:
-  group: deploy-loan-approval-app
-  cancel-in-progress: false
+  group: deploy-main
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Get the latest repository contents for this workflow run.
+      # Checkout is used here so the workflow can print the commit message
+      # that caused the deployment.
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Make the reason for the deployment visible in the GitHub Actions log.
+      # This helps explain whether the deploy came from a normal app change,
+      # a retraining model package commit, a rollback commit, or a manual run.
+      - name: Explain why this deployment is running
+        run: |
+          echo "Deployment workflow started."
+          echo "Trigger event: ${{ github.event_name }}"
+          echo "Branch/ref: ${{ github.ref_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Commit message:"
+          git log -1 --pretty=%B
 
       # Connect to the Google VM over SSH and run the deployment script.
       # The script pulls the latest code on the VM, rebuilds the Docker image,

@@ -1,5 +1,22 @@
 name: Model Package Rollback
 
+run-name: Rollback ${{ github.event.inputs.model_package_path }} to ${{ github.event.inputs.source_commit }}
+
+# Model Governance / Rollback workflow.
+#
+# This workflow restores a selected model package folder from a chosen Git commit.
+# It does not roll back the whole application.
+#
+# Example:
+# source_commit = 195c6f9
+# model_package_path = models/model-v2-candidate
+#
+# If the restore changes files, the workflow commits the rollback back to main.
+# The push to main then triggers the normal deployment workflow.
+#
+# This workflow does not directly trigger deploy.yml.
+# Deployment happens once through the normal push-to-main deployment path.
+
 "on":
   workflow_dispatch:
     inputs:
@@ -30,7 +47,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.ACTIONS_PUSH_TOKEN }}
 
-      # Print the selected rollback details.
+      # Print the selected rollback details so the reason for the run is visible.
       - name: Show rollback details
         run: |
           echo "Rolling back model package..."
@@ -38,6 +55,7 @@ jobs:
           echo "Model package path: ${{ github.event.inputs.model_package_path }}"
 
       # Restore only the selected model package folder from the chosen commit.
+      # This avoids reverting unrelated app code.
       - name: Restore model package from selected commit
         run: |
           git checkout ${{ github.event.inputs.source_commit }} -- ${{ github.event.inputs.model_package_path }}
@@ -49,6 +67,7 @@ jobs:
           git diff --stat
 
       # Commit the restored model package and push it back to main.
+      # The resulting push to main triggers the normal deployment workflow.
       - name: Commit model package rollback
         id: commit_rollback
         run: |
@@ -61,7 +80,7 @@ jobs:
             echo "No model package changes to commit."
             echo "rollback_committed=false" >> $GITHUB_OUTPUT
           else
-            git commit -m "Rollback model package to ${{ github.event.inputs.source_commit }}"
+            git commit -m "Rollback: restore ${{ github.event.inputs.model_package_path }} to ${{ github.event.inputs.source_commit }}"
 
             git remote set-url origin "https://x-access-token:${{ secrets.ACTIONS_PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
 
@@ -69,11 +88,13 @@ jobs:
             echo "rollback_committed=true" >> $GITHUB_OUTPUT
           fi
 
-      # Trigger deployment only if a rollback commit was created.
-      - name: Trigger deployment after rollback
-        if: steps.commit_rollback.outputs.rollback_committed == 'true'
+      # Print a clear final message for the demo log.
+      - name: Summarise rollback result
         run: |
-          echo "Triggering deployment workflow after model rollback..."
-          gh workflow run deploy.yml --ref main
-        env:
-          GH_TOKEN: ${{ secrets.ACTIONS_PUSH_TOKEN }}
+          if [ "${{ steps.commit_rollback.outputs.rollback_committed }}" = "true" ]; then
+            echo "Rollback commit was created and pushed to main."
+            echo "The normal deployment workflow should now run from the push to main."
+          else
+            echo "No rollback commit was needed because the model package already matched the selected commit."
+            echo "No deployment will be triggered because there was no new commit."
+          fi

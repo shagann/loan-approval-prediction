@@ -1,5 +1,21 @@
 name: Drift Check and Retrain
 
+run-name: Drift check and conditional retrain by ${{ github.actor }}
+
+# Continuous Monitoring and Continuous Training workflow.
+#
+# This workflow checks whether live prediction data has drifted.
+# If drift is detected, it runs the retraining script.
+#
+# The retraining script creates/updates a candidate model package:
+# models/model-v2-candidate
+#
+# That candidate model package is committed back to main.
+# The push to main then triggers the normal deployment workflow.
+#
+# This workflow does not directly trigger deploy.yml.
+# Deployment happens once through the normal push-to-main deployment path.
+
 "on":
   workflow_dispatch:
     inputs:
@@ -28,6 +44,7 @@ jobs:
 
     steps:
       # Choose the normal drift endpoint or the forced drift endpoint.
+      # force_drift=true is used only for demo/testing.
       - name: Choose drift check URL
         id: drift_url
         run: |
@@ -81,13 +98,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas scikit-learn joblib
 
-      # Run the retraining script. This creates retraining metrics and a candidate model package.
+      # Run the retraining script.
+      # For this assignment version, the script creates a candidate model package
+      # and retraining metrics. In a production system this would train a fresh
+      # model and generate new .pth and .pkl artefacts.
       - name: Run retraining script
         run: |
           echo "Drift detected. Starting retraining..."
           python training/retrain_model.py
 
       # Commit the new candidate model package and retraining metrics back to Git.
+      # This provides model artefact versioning and allows rollback using Git history.
       - name: Commit candidate model package
         run: |
           git config user.name "github-actions"
@@ -98,7 +119,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No retraining artefacts to commit."
           else
-            git commit -m "Add candidate model package from retraining workflow"
+            git commit -m "Retrain: update model-v2-candidate package after drift detection"
 
             git remote set-url origin "https://x-access-token:${{ secrets.ACTIONS_PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
 
