@@ -14,7 +14,7 @@ name: Drift Check and Retrain
   schedule:
     - cron: "0 9 * * *"
 
-# This permission allows the workflow to commit a new candidate model package back to the repository.
+# Allow this workflow to commit candidate model packages back to the repository.
 permissions:
   contents: write
 
@@ -22,12 +22,12 @@ jobs:
   drift-check:
     runs-on: ubuntu-latest
 
-    # This output is used by the retrain job to decide whether retraining should run.
+    # Pass the drift result to the retrain job.
     outputs:
       drift_detected: ${{ steps.check_drift.outputs.drift_detected }}
 
     steps:
-      # Choose the normal drift endpoint or the forced demo endpoint.
+      # Choose the normal drift endpoint or the forced drift endpoint.
       - name: Choose drift check URL
         id: drift_url
         run: |
@@ -58,18 +58,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: drift-check
 
-    # Only run retraining when the drift-check job found drift.
+    # Only run retraining when the drift-check job detected drift.
     if: needs.drift-check.outputs.drift_detected == 'true'
 
     steps:
-      # Checkout the repository so the retraining script can access data and model artefacts.
+      # Checkout the repository using the push token so the workflow can commit model artefacts.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.ACTIONS_PUSH_TOKEN }}
           fetch-depth: 0
 
-      # Use Python 3.9 to match the Docker/app environment.
+      # Use Python 3.9 to match the app environment.
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -99,11 +99,21 @@ jobs:
             echo "No retraining artefacts to commit."
           else
             git commit -m "Add candidate model package from retraining workflow"
+
             git remote set-url origin "https://x-access-token:${{ secrets.ACTIONS_PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
+
             git push origin HEAD:main
           fi
 
-      # Upload the retraining metrics as a visible GitHub Actions artifact.
+      # Trigger the deployment workflow after the candidate model package has been committed.
+      - name: Trigger deployment after retraining
+        run: |
+          echo "Triggering deployment workflow after candidate model package commit..."
+          gh workflow run deploy.yml --ref main
+        env:
+          GH_TOKEN: ${{ secrets.ACTIONS_PUSH_TOKEN }}
+
+      # Upload the retraining metrics as visible GitHub Actions evidence.
       - name: Upload retraining metrics
         uses: actions/upload-artifact@v4
         with:

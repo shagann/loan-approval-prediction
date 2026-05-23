@@ -1,18 +1,25 @@
 name: Deploy Loan Approval App
 
-on:
+# Run this workflow when code or model package changes are pushed to main.
+# Also allow it to be started manually or triggered by another workflow.
+"on":
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Get the latest repository contents for this workflow run.
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Connect to the Google VM over SSH and run the deployment script.
+      # The script pulls the latest code on the VM, rebuilds the Docker image,
+      # restarts the container, and runs health/version checks.
       - name: Deploy to Google VM
         uses: appleboy/ssh-action@v1.0.3
         with:

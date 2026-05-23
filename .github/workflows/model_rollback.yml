@@ -13,6 +13,7 @@ name: Model Package Rollback
         default: "models/model-v2-candidate"
         type: string
 
+# Allow this workflow to commit rollback changes back to the repository.
 permissions:
   contents: write
 
@@ -49,6 +50,7 @@ jobs:
 
       # Commit the restored model package and push it back to main.
       - name: Commit model package rollback
+        id: commit_rollback
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -57,10 +59,21 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "No model package changes to commit."
+            echo "rollback_committed=false" >> $GITHUB_OUTPUT
           else
             git commit -m "Rollback model package to ${{ github.event.inputs.source_commit }}"
 
             git remote set-url origin "https://x-access-token:${{ secrets.ACTIONS_PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
 
             git push origin HEAD:main
+            echo "rollback_committed=true" >> $GITHUB_OUTPUT
           fi
+
+      # Trigger deployment only if a rollback commit was created.
+      - name: Trigger deployment after rollback
+        if: steps.commit_rollback.outputs.rollback_committed == 'true'
+        run: |
+          echo "Triggering deployment workflow after model rollback..."
+          gh workflow run deploy.yml --ref main
+        env:
+          GH_TOKEN: ${{ secrets.ACTIONS_PUSH_TOKEN }}
