@@ -105,14 +105,6 @@ jobs:
             git push origin HEAD:main
           fi
 
-      # Trigger the deployment workflow after the candidate model package has been committed.
-      - name: Trigger deployment after retraining
-        run: |
-          echo "Triggering deployment workflow after candidate model package commit..."
-          gh workflow run deploy.yml --ref main
-        env:
-          GH_TOKEN: ${{ secrets.ACTIONS_PUSH_TOKEN }}
-
       # Upload the retraining metrics as visible GitHub Actions evidence.
       - name: Upload retraining metrics
         uses: actions/upload-artifact@v4
