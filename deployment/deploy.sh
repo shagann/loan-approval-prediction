@@ -8,22 +8,27 @@ APP_DIR="/opt/mlops/loan-approval-prediction"
 APP_NAME="loan-approval-app"
 IMAGE_NAME="loan-approval-app:latest"
 
-# This controls which versioned model package the Flask app loads.
-# The drift/retrain workflow can update this to model-v2-candidate after approval.
+# This controls which versioned model package app.py loads.
+# The drift/retrain workflow can update this after the evaluation gate approves the candidate.
 MODEL_VERSION="model-v2-candidate"
 
 echo "Starting deployment for Loan Approval Prediction API..."
 echo "App directory: ${APP_DIR}"
 echo "Docker image: ${IMAGE_NAME}"
 echo "Docker container: ${APP_NAME}"
-echo "Selected model version: ${MODEL_VERSION}"
+echo "Expected model version: ${MODEL_VERSION}"
 
 # Move into the app repository on the VM.
 cd "${APP_DIR}"
 
-# Pull latest app code, model packages and deployment config from GitHub.
-echo "Pulling latest code from GitHub..."
-git pull origin main
+# Force the VM repository to match origin/main.
+# This avoids stale files or manual VM edits affecting deployment.
+echo "Synchronising VM repository with origin/main..."
+git fetch origin main
+git reset --hard origin/main
+
+echo "Current deployment model setting:"
+grep "MODEL_VERSION" deployment/deploy.sh
 
 # Build a fresh Docker image from the current repository state.
 echo "Building Docker image..."
@@ -58,6 +63,19 @@ docker run -d \
 echo "Waiting for app to start..."
 sleep 10
 
+# Check that the Docker container was started with the expected model version.
+echo "Checking Docker container MODEL_VERSION..."
+CONTAINER_MODEL_VERSION=$(docker inspect "${APP_NAME}" --format='{{range .Config.Env}}{{println .}}{{end}}' | grep '^MODEL_VERSION=' | cut -d '=' -f2)
+
+echo "Container MODEL_VERSION: ${CONTAINER_MODEL_VERSION}"
+
+if [ "${CONTAINER_MODEL_VERSION}" != "${MODEL_VERSION}" ]; then
+  echo "ERROR: Container MODEL_VERSION does not match expected MODEL_VERSION."
+  echo "Expected: ${MODEL_VERSION}"
+  echo "Actual: ${CONTAINER_MODEL_VERSION}"
+  exit 1
+fi
+
 # Health check proves the container is running.
 echo "Running health check..."
 curl -f http://localhost/health
@@ -69,4 +87,28 @@ echo "Running version check..."
 curl -f http://localhost/version
 
 echo ""
-echo "Deployment completed successfully."
+
+# Check that the live /version endpoint reports the expected model version.
+echo "Checking /version model_version..."
+LIVE_MODEL_VERSION=$(python - <<EOF
+import json
+import urllib.request
+
+with urllib.request.urlopen("http://localhost/version") as response:
+    data = json.load(response)
+
+print(data.get("model_version"))
+EOF
+)
+
+echo "Live /version model_version: ${LIVE_MODEL_VERSION}"
+
+if [ "${LIVE_MODEL_VERSION}" != "${MODEL_VERSION}" ]; then
+  echo "ERROR: /version model_version does not match expected MODEL_VERSION."
+  echo "Expected: ${MODEL_VERSION}"
+  echo "Actual: ${LIVE_MODEL_VERSION}"
+  exit 1
+fi
+
+echo ""
+echo "Deployment completed successfully with MODEL_VERSION=${MODEL_VERSION}."
