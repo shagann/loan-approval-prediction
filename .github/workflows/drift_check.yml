@@ -1,20 +1,8 @@
 name: Drift Check and Retrain
 
-run-name: Drift check and conditional retrain by ${{ github.actor }}
+run-name: Drift check, retrain, and auto-promote by ${{ github.actor }}
 
-# Continuous Monitoring and Continuous Training workflow.
-#
-# This workflow checks whether live prediction data has drifted.
-# If drift is detected, it runs the retraining script.
-#
-# The retraining script creates/updates a candidate model package:
-# models/model-v2-candidate
-#
-# That candidate model package is committed back to main.
-# The push to main then triggers the normal deployment workflow.
-#
-# This workflow does not directly trigger deploy.yml.
-# Deployment happens once through the normal push-to-main deployment path.
+# Checks drift, retrains if needed, and promotes the candidate if the evaluation gate approves it.
 
 "on":
   workflow_dispatch:
@@ -30,7 +18,6 @@ run-name: Drift check and conditional retrain by ${{ github.actor }}
   schedule:
     - cron: "0 9 * * *"
 
-# Allow this workflow to commit candidate model packages back to the repository.
 permissions:
   contents: write
 
@@ -38,13 +25,11 @@ jobs:
   drift-check:
     runs-on: ubuntu-latest
 
-    # Pass the drift result to the retrain job.
     outputs:
       drift_detected: ${{ steps.check_drift.outputs.drift_detected }}
 
     steps:
-      # Choose the normal drift endpoint or the forced drift endpoint.
-      # force_drift=true is used only for demo/testing.
+      # Use forced drift only for demos/tests.
       - name: Choose drift check URL
         id: drift_url
         run: |
@@ -54,7 +39,7 @@ jobs:
             echo "url=http://${{ secrets.VM_HOST }}/drift-check" >> $GITHUB_OUTPUT
           fi
 
-      # Call the deployed app drift endpoint and save the JSON result.
+      # Call the deployed drift endpoint and extract drift_detected.
       - name: Run drift check
         id: check_drift
         run: |
@@ -75,58 +60,74 @@ jobs:
     runs-on: ubuntu-latest
     needs: drift-check
 
-    # Only run retraining when the drift-check job detected drift.
     if: needs.drift-check.outputs.drift_detected == 'true'
 
     steps:
-      # Checkout the repository using the push token so the workflow can commit model artefacts.
+      # Checkout with push token so this job can commit model artefacts.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.ACTIONS_PUSH_TOKEN }}
           fetch-depth: 0
 
-      # Use Python 3.9 to match the app environment.
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
-      # Install the dependencies needed by the retraining script.
       - name: Install retraining dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pandas scikit-learn joblib
 
-      # Run the retraining script.
-      # For this assignment version, the script creates a candidate model package
-      # and retraining metrics. In a production system this would train a fresh
-      # model and generate new .pth and .pkl artefacts.
+      # Creates/updates models/model-v2-candidate and writes retraining_metrics.json.
       - name: Run retraining script
         run: |
           echo "Drift detected. Starting retraining..."
           python training/retrain_model.py
 
-      # Commit the new candidate model package and retraining metrics back to Git.
-      # This provides model artefact versioning and allows rollback using Git history.
-      - name: Commit candidate model package
+      # If the evaluation gate approves, switch deployment to model-v2-candidate.
+      - name: Auto-promote approved candidate model
+        run: |
+          PROMOTION_DECISION=$(python -c "import json; print(json.load(open('training/retraining_metrics.json')).get('promotion_decision', 'rejected'))")
+
+          echo "Promotion decision: $PROMOTION_DECISION"
+
+          if [ "$PROMOTION_DECISION" = "approved" ]; then
+            echo "Candidate approved. Promoting model-v2-candidate..."
+
+            sed -i 's/^MODEL_VERSION=.*/MODEL_VERSION="model-v2-candidate"/' deployment/deploy.sh
+
+            echo "MODEL_VERSION after promotion:"
+            grep "MODEL_VERSION" deployment/deploy.sh
+          else
+            echo "Candidate not approved. Keeping current production model."
+          fi
+
+      # Commit candidate artefacts and any MODEL_VERSION promotion in one commit.
+      - name: Commit retraining and promotion changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add models/model-v2-candidate training/retraining_metrics.json
+          git add models/model-v2-candidate training/retraining_metrics.json deployment/deploy.sh
 
           if git diff --cached --quiet; then
-            echo "No retraining artefacts to commit."
+            echo "No retraining or promotion artefacts to commit."
           else
-            git commit -m "Retrain: update model-v2-candidate package after drift detection"
+            PROMOTION_DECISION=$(python -c "import json; print(json.load(open('training/retraining_metrics.json')).get('promotion_decision', 'rejected'))")
+
+            if [ "$PROMOTION_DECISION" = "approved" ]; then
+              git commit -m "Retrain: approve and promote model-v2-candidate after evaluation gate"
+            else
+              git commit -m "Retrain: update model-v2-candidate package after drift detection"
+            fi
 
             git remote set-url origin "https://x-access-token:${{ secrets.ACTIONS_PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
 
             git push origin HEAD:main
           fi
 
-      # Upload the retraining metrics as visible GitHub Actions evidence.
       - name: Upload retraining metrics
         uses: actions/upload-artifact@v4
         with:
