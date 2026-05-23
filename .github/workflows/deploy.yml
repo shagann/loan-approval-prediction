@@ -10,7 +10,7 @@ name: Deploy Loan Approval App
 
 concurrency:
   group: deploy-loan-approval-app
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
