@@ -10,7 +10,7 @@ name: Model Package Rollback
       model_package_path:
         description: "Model package folder to roll back"
         required: true
-        default: "models/baseline-model"
+        default: "models/model-v2-candidate"
         type: string
 
 permissions:
@@ -21,27 +21,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the current main branch using the push token.
       - name: Checkout current main branch
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ secrets.ACTIONS_PUSH_TOKEN }}
 
+      # Print the selected rollback details.
       - name: Show rollback details
         run: |
           echo "Rolling back model package..."
           echo "Source commit: ${{ github.event.inputs.source_commit }}"
           echo "Model package path: ${{ github.event.inputs.model_package_path }}"
 
+      # Restore only the selected model package folder from the chosen commit.
       - name: Restore model package from selected commit
         run: |
           git checkout ${{ github.event.inputs.source_commit }} -- ${{ github.event.inputs.model_package_path }}
 
+      # Show what changed before committing.
       - name: Show changed files
         run: |
           git status
           git diff --stat
 
+      # Commit the restored model package and push it back to main.
       - name: Commit model package rollback
         run: |
           git config user.name "github-actions"
@@ -53,5 +59,8 @@ jobs:
             echo "No model package changes to commit."
           else
             git commit -m "Rollback model package to ${{ github.event.inputs.source_commit }}"
-            git push origin main
+
+            git remote set-url origin "https://x-access-token:${{ secrets.ACTIONS_PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
+
+            git push origin HEAD:main
           fi
