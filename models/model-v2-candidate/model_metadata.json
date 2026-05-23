@@ -1,0 +1,20 @@
+{
+    "model_version": "model-v2-candidate",
+    "model_stage": "candidate",
+    "created_for": "Loan Approval Prediction API",
+    "training_dataset": "LAP.csv",
+    "rows": 598,
+    "columns": 13,
+    "created_at_utc": "2026-05-23T00:11:20.215534",
+    "source_model_version": "baseline-model",
+    "model_files": [
+        "model.pth",
+        "best_model.pth"
+    ],
+    "preprocessing_files": [
+        "scaler.pkl",
+        "label_encoders.pkl",
+        "label_encoder_target.pkl"
+    ],
+    "notes": "Candidate model package created by the retraining workflow after drift detection. For this assignment version, the baseline artefacts are copied and metadata is updated to demonstrate model versioning, promotion, and rollback flow."
+}
