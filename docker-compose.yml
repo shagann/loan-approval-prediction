@@ -1,0 +1,24 @@
+services:
+  loan-approval-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: loan-approval-app:latest
+    container_name: loan-approval-app
+
+    restart: unless-stopped
+
+    ports:
+      - "80:5000"
+
+    volumes:
+      - ./logs:/app/logs
+
+    environment:
+      PORT: "5000"
+      APP_VERSION: "docker-compose-deploy"
+      MODEL_VERSION: "${MODEL_VERSION}"
+      GIT_COMMIT: "${GIT_COMMIT}"
+      BUILD_TIME: "${BUILD_TIME}"
+      DEPLOYMENT_ENVIRONMENT: "google-vm-docker-compose"

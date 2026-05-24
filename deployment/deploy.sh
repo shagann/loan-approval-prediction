@@ -15,7 +15,7 @@ MODEL_VERSION="model-v2-candidate"
 echo "Starting deployment for Loan Approval Prediction API..."
 echo "App directory: ${APP_DIR}"
 echo "Docker image: ${IMAGE_NAME}"
-echo "Docker container: ${APP_NAME}"
+echo "Docker container/service: ${APP_NAME}"
 echo "Expected model version: ${MODEL_VERSION}"
 
 # Move into the app repository on the VM.
@@ -30,38 +30,31 @@ git reset --hard origin/main
 echo "Current deployment model setting:"
 grep "MODEL_VERSION" deployment/deploy.sh
 
-# Build a fresh Docker image from the current repository state.
-echo "Building Docker image..."
-docker build -t "${IMAGE_NAME}" .
+# Export variables so docker-compose.yml can read them.
+export MODEL_VERSION="${MODEL_VERSION}"
+export GIT_COMMIT="$(git rev-parse --short HEAD)"
+export BUILD_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-# Stop and remove the previous container if it exists.
-echo "Stopping old container if it exists..."
-docker stop "${APP_NAME}" || true
+echo "Deployment environment variables:"
+echo "MODEL_VERSION=${MODEL_VERSION}"
+echo "GIT_COMMIT=${GIT_COMMIT}"
+echo "BUILD_TIME=${BUILD_TIME}"
 
-echo "Removing old container if it exists..."
-docker rm "${APP_NAME}" || true
+# Stop the existing Compose service if it exists.
+echo "Stopping existing Docker Compose service if it exists..."
+docker compose down || true
 
-# Start the new container.
-# Port 80 on the VM maps to Flask port 5000 inside the container.
-# The logs directory is mounted so prediction logs survive redeploys.
-# MODEL_VERSION tells app.py to load models/<MODEL_VERSION>/.
-echo "Starting new Docker container..."
-docker run -d \
-  --name "${APP_NAME}" \
-  --restart unless-stopped \
-  -p 80:5000 \
-  -v /opt/mlops/loan-approval-prediction/logs:/app/logs \
-  -e PORT=5000 \
-  -e APP_VERSION=manual-deploy-script \
-  -e MODEL_VERSION="${MODEL_VERSION}" \
-  -e GIT_COMMIT=$(git rev-parse --short HEAD) \
-  -e BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
-  -e DEPLOYMENT_ENVIRONMENT=google-vm-docker-bridge \
-  "${IMAGE_NAME}"
+# Build and start the application using Docker Compose.
+echo "Building and starting application using Docker Compose..."
+docker compose up -d --build
 
 # Give the Flask app time to start.
 echo "Waiting for app to start..."
 sleep 10
+
+# Show running containers.
+echo "Showing running containers..."
+docker ps
 
 # Check that the Docker container was started with the expected model version.
 echo "Checking Docker container MODEL_VERSION..."
