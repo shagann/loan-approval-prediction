@@ -4,6 +4,33 @@ Loan Approval Prediction Web App (Flask + ML)
 
 This project is a Flask web application that predicts loan approval based on user-provided information. It serves a trained machine learning model and includes a separate training script to build and evaluate traditional ML ensembles.
 
+## Pipeline configuration
+# Reproducing the Deployment
+
+This project uses GitHub Actions secrets to deploy securely to a Google VM. These secrets are not committed to the repository and are not visible to users who clone or fork the repo.
+
+To recreate the deployment, the following repository secrets must be created in GitHub:
+
+| Secret | Purpose |
+|---|---|
+| `VM_HOST` | External IP address of the Google VM |
+| `VM_USER` | SSH username used by GitHub Actions |
+| `VM_SSH_KEY` | Private SSH key used by GitHub Actions to connect to the VM |
+| `ACTIONS_PUSH_TOKEN` | GitHub token used by workflows that commit model/retraining/rollback changes back to the repository |
+
+The VM must be pre-provisioned with:
+
+- Docker
+- Git
+- SSH access
+- Firewall rule allowing HTTP traffic on port 80
+- Repository cloned to `/opt/mlops/loan-approval-prediction`
+- User permissions to run Docker
+
+The deployment workflow is reproducible once these environment-specific secrets and VM prerequisites are configured. The secrets are intentionally excluded from the repository for security reasons.
+
+
+
 ## Features
 
 - End-to-end loan approval prediction web UI built with Flask

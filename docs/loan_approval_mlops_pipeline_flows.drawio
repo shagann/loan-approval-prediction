@@ -1,0 +1,305 @@
+<mxfile host="Electron" agent="ChatGPT">
+  <diagram name="Pipeline Flows" id="pipeline-flows">
+    <mxGraphModel dx="2271" dy="1272" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontSize=28;fontStyle=1;align=center;verticalAlign=middle;fontColor=#0b1f3a;" value="Loan Approval MLOps Pipeline Flows" vertex="1">
+          <mxGeometry height="40" width="850" x="360" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="p0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;opacity=20;" value="" vertex="1">
+          <mxGeometry height="145" width="1520" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p0_hdr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#666666;strokeColor=#666666;fontColor=#ffffff;fontStyle=1;fontSize=16;align=center;" value="HIGH-LEVEL PIPELINE" vertex="1">
+          <mxGeometry height="40" width="1520" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="h1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" value="Developer / User&lt;br&gt;code or model change" vertex="1">
+          <mxGeometry height="55" width="170" x="90" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="h2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" value="GitHub Repository&lt;br&gt;code + workflows + model packages" vertex="1">
+          <mxGeometry height="55" width="170" x="315" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="h3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" value="GitHub Actions&lt;br&gt;orchestration layer" vertex="1">
+          <mxGeometry height="55" width="170" x="540" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="h4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" value="Google Cloud VM&lt;br&gt;prepared runtime target" vertex="1">
+          <mxGeometry height="55" width="170" x="765" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="h5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" value="Docker Container&lt;br&gt;Flask model service" vertex="1">
+          <mxGeometry height="55" width="170" x="990" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="h6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;fontSize=12;align=center;verticalAlign=middle;" value="Monitoring &amp; Governance&lt;br&gt;metrics, drift, report, rollback" vertex="1">
+          <mxGeometry height="55" width="170" x="1215" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="he0" edge="1" parent="1" source="h1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="h2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="he1" edge="1" parent="1" source="h2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="h3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="he2" edge="1" parent="1" source="h3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="h4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="he3" edge="1" parent="1" source="h4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="h5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="he4" edge="1" parent="1" source="h5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="h6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;opacity=20;" value="" vertex="1">
+          <mxGeometry height="210" width="720" x="40" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_hdr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6c8ebf;strokeColor=#6c8ebf;fontColor=#ffffff;fontStyle=1;fontSize=16;align=center;" value="1. MODEL DEPLOYMENT FLOW" vertex="1">
+          <mxGeometry height="40" width="720" x="40" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;fontSize=12;align=center;verticalAlign=middle;" value="Code / config&lt;br&gt;change" vertex="1">
+          <mxGeometry height="68" width="90" x="70" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;fontSize=12;align=center;verticalAlign=middle;" value="Push to&lt;br&gt;main branch" vertex="1">
+          <mxGeometry height="68" width="90" x="185" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;fontSize=12;align=center;verticalAlign=middle;" value="Deploy workflow&lt;br&gt;starts" vertex="1">
+          <mxGeometry height="68" width="90" x="300" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;fontSize=12;align=center;verticalAlign=middle;" value="SSH to VM +&lt;br&gt;pull latest" vertex="1">
+          <mxGeometry height="68" width="90" x="415" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="d5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;fontSize=12;align=center;verticalAlign=middle;" value="Build &amp; run&lt;br&gt;Docker container" vertex="1">
+          <mxGeometry height="68" width="90" x="530" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="d6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;fontSize=12;align=center;verticalAlign=middle;" value="Verify&lt;br&gt;/health + /version" vertex="1">
+          <mxGeometry height="68" width="90" x="645" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d1_d2" edge="1" parent="1" source="d1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="d2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d2_d3" edge="1" parent="1" source="d2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="d3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d3_d4" edge="1" parent="1" source="d3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="d4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d4_d5" edge="1" parent="1" source="d4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="d5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d5_d6" edge="1" parent="1" source="d5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="d6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dout" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;fontSize=12;align=center;verticalAlign=middle;" value="Outcome: latest application and selected model package are deployed and verified on the VM" vertex="1">
+          <mxGeometry height="28" width="480" x="160" y="455" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;opacity=20;" value="" vertex="1">
+          <mxGeometry height="300" width="760" x="800" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="p2_hdr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#82b366;strokeColor=#82b366;fontColor=#ffffff;fontStyle=1;fontSize=16;align=center;" value="2. DRIFT CHECK &amp; CONTINUOUS TRAINING FLOW" vertex="1">
+          <mxGeometry height="40" width="760" x="800" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="ct1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="/drift-check&lt;br&gt;endpoint called" vertex="1">
+          <mxGeometry height="70" width="105" x="830" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="ct2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Read recent&lt;br&gt;predictions.csv" vertex="1">
+          <mxGeometry height="70" width="105" x="960" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="ct3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Compare with&lt;br&gt;LAP.csv baseline" vertex="1">
+          <mxGeometry height="70" width="105" x="1090" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="ct4" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Drift&lt;br&gt;detected?" vertex="1">
+          <mxGeometry height="80" width="95" x="1422.5" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_no" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="No action&lt;br&gt;required" vertex="1">
+          <mxGeometry height="55" width="110" x="1390" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="ct5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Run&lt;br&gt;retrain_model.py" vertex="1">
+          <mxGeometry height="65" width="105" x="830" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="ct6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Create / update&lt;br&gt;model-v2-candidate" vertex="1">
+          <mxGeometry height="65" width="120" x="960" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="ct7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Evaluate candidate&lt;br&gt;metrics" vertex="1">
+          <mxGeometry height="65" width="105" x="1105" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="ct8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="promotion_decision&lt;br&gt;approved?" vertex="1">
+          <mxGeometry height="75" width="115" x="1230" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="ct9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Update MODEL_VERSION&lt;br&gt;commit to main" vertex="1">
+          <mxGeometry height="65" width="120" x="1410" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_e1" edge="1" parent="1" source="ct1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_e2" edge="1" parent="1" source="ct2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_e3" edge="1" parent="1" source="ct3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_no_e" edge="1" parent="1" source="ct4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct_no" value="NO">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_yes_e" edge="1" parent="1" source="ct4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct5" value="YES">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="883" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ct_e5" edge="1" parent="1" source="ct5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_e6" edge="1" parent="1" source="ct6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_e7" edge="1" parent="1" source="ct7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ct_e8" edge="1" parent="1" source="ct8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ct9" value="YES">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctout" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf7ed;strokeColor=#82b366;fontSize=12;align=center;verticalAlign=middle;" value="Outcome: model is retrained only when drift is detected; approved candidate can trigger redeployment" vertex="1">
+          <mxGeometry height="24" width="485" x="930" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;opacity=20;" value="" vertex="1">
+          <mxGeometry height="175" width="720" x="40" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="p3_hdr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9673a6;strokeColor=#9673a6;fontColor=#ffffff;fontStyle=1;fontSize=16;align=center;" value="3. EVIDENTLY REPORT FLOW - MONITORING EVIDENCE" vertex="1">
+          <mxGeometry height="40" width="720" x="40" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="ev1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3eaf8;strokeColor=#9673a6;fontSize=12;align=center;verticalAlign=middle;" value="LAP.csv&lt;br&gt;reference data" vertex="1">
+          <mxGeometry height="65" width="105" x="70" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ev2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3eaf8;strokeColor=#9673a6;fontSize=12;align=center;verticalAlign=middle;" value="predictions.csv&lt;br&gt;live data" vertex="1">
+          <mxGeometry height="65" width="105" x="200" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ev3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3eaf8;strokeColor=#9673a6;fontSize=12;align=center;verticalAlign=middle;" value="Run&lt;br&gt;evidently_generate_report.py" vertex="1">
+          <mxGeometry height="65" width="105" x="330" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ev4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3eaf8;strokeColor=#9673a6;fontSize=12;align=center;verticalAlign=middle;" value="Generate&lt;br&gt;HTML report" vertex="1">
+          <mxGeometry height="65" width="105" x="490" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ev5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3eaf8;strokeColor=#9673a6;fontSize=12;align=center;verticalAlign=middle;" value="Upload as&lt;br&gt;GitHub Actions artifact" vertex="1">
+          <mxGeometry height="65" width="105" x="615" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ev_e1" edge="1" parent="1" source="ev1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="633" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ev_e2" edge="1" parent="1" source="ev2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ev3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ev_e3" edge="1" parent="1" source="ev3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ev4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ev_e4" edge="1" parent="1" source="ev4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="ev5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="evout" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3eaf8;strokeColor=#9673a6;fontSize=12;align=center;verticalAlign=middle;" value="Outcome: monitoring report is generated and available for human review" vertex="1">
+          <mxGeometry height="24" width="480" x="160" y="675" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;opacity=20;" value="" vertex="1">
+          <mxGeometry height="185" width="720" x="40" y="745" as="geometry" />
+        </mxCell>
+        <mxCell id="p4_hdr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d79b00;strokeColor=#d79b00;fontColor=#ffffff;fontStyle=1;fontSize=16;align=center;" value="4. MODEL ROLLBACK FLOW" vertex="1">
+          <mxGeometry height="40" width="720" x="40" y="745" as="geometry" />
+        </mxCell>
+        <mxCell id="rb1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;fontSize=12;align=center;verticalAlign=middle;" value="Rollback workflow&lt;br&gt;triggered" vertex="1">
+          <mxGeometry height="65" width="95" x="65" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="rb2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;fontSize=12;align=center;verticalAlign=middle;" value="Select previous&lt;br&gt;commit/package" vertex="1">
+          <mxGeometry height="65" width="100" x="175" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="rb3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;fontSize=12;align=center;verticalAlign=middle;" value="Restore model&lt;br&gt;package" vertex="1">
+          <mxGeometry height="65" width="95" x="290" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="rb4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;fontSize=12;align=center;verticalAlign=middle;" value="Commit rollback&lt;br&gt;changes" vertex="1">
+          <mxGeometry height="65" width="95" x="400" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="rb5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;fontSize=12;align=center;verticalAlign=middle;" value="Deploy workflow&lt;br&gt;runs" vertex="1">
+          <mxGeometry height="65" width="95" x="510" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="rb6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;fontSize=12;align=center;verticalAlign=middle;" value="Verify&lt;br&gt;/health + /version" vertex="1">
+          <mxGeometry height="65" width="95" x="620" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="rb_e_rb1_rb2" edge="1" parent="1" source="rb1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rb2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rb_e_rb2_rb3" edge="1" parent="1" source="rb2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rb3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rb_e_rb3_rb4" edge="1" parent="1" source="rb3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rb4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rb_e_rb4_rb5" edge="1" parent="1" source="rb4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rb5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rb_e_rb5_rb6" edge="1" parent="1" source="rb5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rb6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rbout" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;fontSize=12;align=center;verticalAlign=middle;" value="Outcome: previous model package state is restored and redeployed" vertex="1">
+          <mxGeometry height="24" width="455" x="170" y="895" as="geometry" />
+        </mxCell>
+        <mxCell id="p5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d9ead3;strokeColor=#6aa84f;strokeWidth=2;opacity=20;" value="" vertex="1">
+          <mxGeometry height="305" width="760" x="800" y="625" as="geometry" />
+        </mxCell>
+        <mxCell id="p5_hdr" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6aa84f;strokeColor=#6aa84f;fontColor=#ffffff;fontStyle=1;fontSize=16;align=center;" value="5. RUNTIME INFERENCE &amp; MONITORING FLOW" vertex="1">
+          <mxGeometry height="40" width="760" x="800" y="625" as="geometry" />
+        </mxCell>
+        <mxCell id="rt1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="User submits&lt;br&gt;loan application" vertex="1">
+          <mxGeometry height="70" width="95" x="830" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="rt2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="Flask app receives&lt;br&gt;request" vertex="1">
+          <mxGeometry height="70" width="95" x="955" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="rt3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="Load scaler +&lt;br&gt;label encoders" vertex="1">
+          <mxGeometry height="70" width="95" x="1080" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="rt4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="Run PyTorch&lt;br&gt;model prediction" vertex="1">
+          <mxGeometry height="70" width="95" x="1205" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="rt5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="Return prediction&lt;br&gt;to user" vertex="1">
+          <mxGeometry height="70" width="95" x="1330" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="rt6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="Log input + result&lt;br&gt;to predictions.csv" vertex="1">
+          <mxGeometry height="70" width="95" x="1455" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="rt_e_rt1_rt2" edge="1" parent="1" source="rt1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rt2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rt_e_rt2_rt3" edge="1" parent="1" source="rt2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rt3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rt_e_rt3_rt4" edge="1" parent="1" source="rt3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rt4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rt_e_rt4_rt5" edge="1" parent="1" source="rt4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rt5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rt_e_rt5_rt6" edge="1" parent="1" source="rt5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rt6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rt9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="/metrics&lt;br&gt;prediction summary" vertex="1">
+          <mxGeometry height="55" width="105" x="1300" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="rt10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="/drift-check&lt;br&gt;retrain trigger" vertex="1">
+          <mxGeometry height="55" width="105" x="1415" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="rt_m3" edge="1" parent="1" source="rt6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;strokeColor=#333333;" target="rt9" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1503" y="800" />
+              <mxPoint x="1340" y="800" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rtout" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4f1;strokeColor=#008080;fontSize=12;align=center;verticalAlign=middle;" value="Outcome: predictions are served, logged, and made available for monitoring workflows" vertex="1">
+          <mxGeometry height="24" width="500" x="930" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="Q5imjITPAV9bBnYx109b-1" edge="1" parent="1" source="rt6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1480" y="830" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
