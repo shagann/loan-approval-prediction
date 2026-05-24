@@ -3,10 +3,22 @@
 # Stop the deployment if any command fails.
 set -e
 
-# Deployment settings.
-APP_DIR="/opt/mlops/loan-approval-prediction"
-APP_NAME="loan-approval-app"
-IMAGE_NAME="loan-approval-app:latest"
+# Load non-sensitive deployment configuration if available.
+# MODEL_VERSION stays in this script because the retraining workflow updates it.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="${SCRIPT_DIR}/vm_config.env"
+
+if [ -f "$CONFIG_FILE" ]; then
+  echo "Loading deployment config from ${CONFIG_FILE}"
+  source "$CONFIG_FILE"
+else
+  echo "No deployment config file found at ${CONFIG_FILE}; using script defaults."
+fi
+
+# Fallback defaults if deployment/vm_config.env is missing.
+APP_DIR="${APP_DIR:-/opt/mlops/loan-approval-prediction}"
+APP_NAME="${APP_NAME:-loan-approval-app}"
+IMAGE_NAME="${IMAGE_NAME:-loan-approval-app:latest}"
 
 # This controls which versioned model package app.py loads.
 # The drift/retrain workflow can update this after the evaluation gate approves the candidate.
@@ -27,6 +39,17 @@ echo "Synchronising VM repository with origin/main..."
 git fetch origin main
 git reset --hard origin/main
 
+# Reload config after git reset in case vm_config.env changed in the latest commit.
+if [ -f "${APP_DIR}/deployment/vm_config.env" ]; then
+  echo "Reloading deployment config after repository sync..."
+  source "${APP_DIR}/deployment/vm_config.env"
+fi
+
+# Reapply fallback defaults after reload.
+APP_DIR="${APP_DIR:-/opt/mlops/loan-approval-prediction}"
+APP_NAME="${APP_NAME:-loan-approval-app}"
+IMAGE_NAME="${IMAGE_NAME:-loan-approval-app:latest}"
+
 echo "Current deployment model setting:"
 grep "MODEL_VERSION" deployment/deploy.sh
 
@@ -39,6 +62,8 @@ echo "Deployment environment variables:"
 echo "MODEL_VERSION=${MODEL_VERSION}"
 echo "GIT_COMMIT=${GIT_COMMIT}"
 echo "BUILD_TIME=${BUILD_TIME}"
+echo "APP_NAME=${APP_NAME}"
+echo "IMAGE_NAME=${IMAGE_NAME}"
 
 # Stop the existing Compose service if it exists.
 echo "Stopping existing Docker Compose service if it exists..."

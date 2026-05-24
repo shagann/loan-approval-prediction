@@ -37,6 +37,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Load non-sensitive VM configuration from the repo.
+      # This makes the workflow easier to recreate because the VM host,
+      # username and app directory are visible in deployment/vm_config.env.
+      #
+      # Sensitive values such as the SSH private key still remain in
+      # GitHub Actions Secrets and are not committed to the public repo.
+      - name: Load VM deployment config
+        run: |
+          echo "Loading VM config from deployment/vm_config.env"
+          cat deployment/vm_config.env | grep -v '^#' | grep -v '^$' >> $GITHUB_ENV
+
       # Make the reason for the deployment visible in the GitHub Actions log.
       # This helps explain whether the deploy came from a normal app change,
       # a retraining model package commit, a rollback commit, or a manual run.
@@ -49,17 +60,23 @@ jobs:
           echo "Commit SHA: ${{ github.sha }}"
           echo "Commit message:"
           git log -1 --pretty=%B
+          echo "Deployment VM host: ${VM_HOST}"
+          echo "Deployment VM user: ${VM_USER}"
+          echo "Deployment app directory: ${APP_DIR}"
 
       # Connect to the Google VM over SSH and run the deployment script.
       # The script pulls the latest code on the VM, rebuilds the Docker image,
       # restarts the container, and runs health/version checks.
+      #
+      # VM_HOST, VM_USER and APP_DIR come from deployment/vm_config.env.
+      # VM_SSH_KEY stays as a GitHub Secret.
       - name: Deploy to Google VM
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
+          host: ${{ env.VM_HOST }}
+          username: ${{ env.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           command_timeout: 30m
           script: |
-            cd /opt/mlops/loan-approval-prediction
+            cd ${{ env.APP_DIR }}
             bash deployment/deploy.sh

@@ -13,49 +13,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository so LAP.csv and the monitoring script are available.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Use Python 3.9 to stay aligned with the Docker app image.
+      - name: Load VM deployment config
+        run: |
+          echo "Loading VM config from deployment/vm_config.env"
+          cat deployment/vm_config.env | grep -v '^#' | grep -v '^$' >> $GITHUB_ENV
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
-      # Install Evidently only in this GitHub Actions runner.
-      # It is not added to requirements.txt or the Flask Docker image.
       - name: Install Evidently dependencies
         run: |
           python -m pip install --upgrade pip
           pip install "evidently==0.4.40" pandas
 
-      # Fetch the live prediction log from the VM.
       - name: Fetch prediction log from VM
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/vm_key
           chmod 600 ~/.ssh/vm_key
 
-          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ env.VM_HOST }}" >> ~/.ssh/known_hosts
 
           mkdir -p logs
 
           ssh -i ~/.ssh/vm_key \
-            "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" \
-            "cat /opt/mlops/loan-approval-prediction/logs/predictions.csv" \
+            "${{ env.VM_USER }}@${{ env.VM_HOST }}" \
+            "cat ${{ env.APP_DIR }}/logs/predictions.csv" \
             > logs/predictions.csv
 
           echo "Prediction log fetched from VM."
           echo "Preview of prediction log:"
           head -5 logs/predictions.csv
 
-      # Generate the Evidently HTML report.
       - name: Generate Evidently drift report
         run: |
           python monitoring/evidently_generate_report.py
 
-      # Upload the HTML report as GitHub Actions evidence.
       - name: Upload Evidently report artifact
         uses: actions/upload-artifact@v4
         with:

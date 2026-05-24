@@ -4,30 +4,85 @@ Loan Approval Prediction Web App (Flask + ML)
 
 This project is a Flask web application that predicts loan approval based on user-provided information. It serves a trained machine learning model and includes a separate training script to build and evaluate traditional ML ensembles.
 
-## Pipeline configuration
-# Reproducing the Deployment
+## Pipeline Configuration
 
-This project uses GitHub Actions secrets to deploy securely to a Google VM. These secrets are not committed to the repository and are not visible to users who clone or fork the repo.
+### Reproducing the Deployment
 
-To recreate the deployment, the following repository secrets must be created in GitHub:
+This project uses GitHub Actions to deploy securely to a pre-provisioned Google VM.
+
+The non-sensitive VM configuration is stored in the repository in `deployment/vm_config.env`.
+
+This file contains the current demo VM values. If recreating the deployment on a different VM, update these values.
+
+```bash
+VM_HOST="34.163.29.46"              # Replace with your VM external IP
+VM_USER="shannon"                   # Replace with your VM SSH username
+APP_DIR="/opt/mlops/loan-approval-prediction"
+APP_NAME="loan-approval-app"
+IMAGE_NAME="loan-approval-app:latest"
+```
+
+These values are included in the repository to make the deployment easier to understand and recreate. They are not secrets. The IP address is specific to the current demo VM and should be changed if deploying to a different VM.
+
+The sensitive values are excluded from the repository and must be configured as GitHub Actions secrets.
 
 | Secret | Purpose |
 |---|---|
-| `VM_HOST` | External IP address of the Google VM |
-| `VM_USER` | SSH username used by GitHub Actions |
-| `VM_SSH_KEY` | Private SSH key used by GitHub Actions to connect to the VM |
-| `ACTIONS_PUSH_TOKEN` | GitHub token used by workflows that commit model/retraining/rollback changes back to the repository |
+| `VM_SSH_KEY` | Private SSH key used by GitHub Actions to connect to the Google VM |
+| `ACTIONS_PUSH_TOKEN` | GitHub token used by workflows that commit model, retraining, promotion or rollback changes back to the repository |
 
 The VM must be pre-provisioned with:
 
 - Docker
+- Docker Compose
 - Git
 - SSH access
 - Firewall rule allowing HTTP traffic on port 80
 - Repository cloned to `/opt/mlops/loan-approval-prediction`
 - User permissions to run Docker
 
-The deployment workflow is reproducible once these environment-specific secrets and VM prerequisites are configured. The secrets are intentionally excluded from the repository for security reasons.
+The deployment workflow is reproducible once the VM prerequisites, `deployment/vm_config.env`, and the required GitHub Actions secrets are configured.
+
+### Workflows
+
+| Workflow | File | Purpose |
+|---|---|---|
+| Deploy Loan Approval App | `.github/workflows/deploy.yml` | Deploys the Dockerised Flask app to the Google VM |
+| Drift Check and Retrain | `.github/workflows/drift_check.yml` | Calls `/drift-check`, retrains if drift is detected, evaluates the candidate model and auto-promotes it if approved |
+| Evidently Monitoring Report | `.github/workflows/evidently_report.yml` | Fetches live prediction logs and generates an Evidently HTML monitoring report |
+| Model Package Rollback | `.github/workflows/model_package_rollback.yml` | Restores a selected model package from a previous Git commit |
+
+### Recreating the Deployment in Another Account
+
+To recreate the deployment:
+
+1. Clone or fork this repository.
+2. Provision a VM with Docker, Docker Compose, Git and SSH access.
+3. Clone the repository on the VM at `/opt/mlops/loan-approval-prediction`.
+4. Update `deployment/vm_config.env` with the new VM IP address, VM username and app path if required.
+5. Add the required GitHub Actions secrets: `VM_SSH_KEY` and `ACTIONS_PUSH_TOKEN`.
+6. Run the deployment workflow from `GitHub Actions → Deploy Loan Approval App → Run workflow`.
+
+After deployment, the application can be tested using the VM host configured in `deployment/vm_config.env`.
+
+```text
+http://<VM_HOST>/health
+http://<VM_HOST>/version
+http://<VM_HOST>/metrics
+http://<VM_HOST>/drift-check
+```
+
+For the current demo VM, `<VM_HOST>` is:
+
+```text
+34.163.29.46
+```
+
+The `/version` endpoint confirms the deployed Git commit, build time, deployment environment and active model package.
+
+### Production Note
+
+In this assignment, the Google VM is pre-provisioned manually. In a production environment, the VM setup would normally be automated using Infrastructure as Code tools such as Terraform, Ansible, cloud-init or a bootstrap script.
 
 
 
