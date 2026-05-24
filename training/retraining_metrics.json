@@ -4,7 +4,7 @@
     "dataset": "LAP.csv",
     "rows": 598,
     "columns": 13,
-    "retraining_time_utc": "2026-05-24T14:21:12.756933",
+    "retraining_time_utc": "2026-05-24T17:16:01.073629",
     "source_model_version": "baseline-model",
     "candidate_model_version": "model-v2-candidate",
     "candidate_model_package": "models/model-v2-candidate",
