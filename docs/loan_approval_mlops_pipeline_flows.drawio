@@ -299,6 +299,9 @@
             <mxPoint x="1480" y="830" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="Q5imjITPAV9bBnYx109b-2" parent="1" style="text;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;&lt;font style=&quot;font-size: 17px;&quot;&gt;The pipeline demonstrated here is: source control, deploy, monitor, detect drift, retrain, evaluate, promote, verify and rollback.&lt;br&gt;The app is evidence that the pipeline works, but the main focus is the operational MLOps lifecycle around the model.&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="50" width="1080" x="230" y="950" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
